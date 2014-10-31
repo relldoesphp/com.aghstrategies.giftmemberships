@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<extension key="com.aghstrategies.giftmemberships" type="module">
+  <file>giftmemberships</file>
+  <name>Gift Memberships</name>
+  <description>FIXME</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>Tyrell Cook</author>
+    <email>tyrell@aghstrategies.com</email>
+  </maintainer>
+  <releaseDate>2014-10-24</releaseDate>
+  <version>1.0</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>4.2</ver>
+  </compatibility>
+  <comments>This is a new, undeveloped module</comments>
+  <civix>
+    <namespace>CRM/Giftmemberships</namespace>
+  </civix>
+</extension>
