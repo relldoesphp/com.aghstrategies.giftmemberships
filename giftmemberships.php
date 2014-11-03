@@ -167,9 +167,11 @@ function giftmemberships_civicrm_postProcess($formName, &$form){
 		}//end foreach
 	  /**** Send Email With Codes ****/
 	  if($giftcodes == true){
+	  	/*** Make beginning of Code Table ***/
   		$codeTable = "<h3>Gift Membership Codes</h3><table width='500px' style='border:1px solid #999;margin:1em 0em 1em;border-collapse:collapse'><thead><tr><th style='text-align:left;padding:4px;border-bottom:1px solid #999;background-color:#eee'>Membership</th><th style='text-align:left;padding:4px;border-bottom:1px solid #999;background-color:#eee'>Code</th></tr></thead><tbody>";
   		$sql = "SELECT * FROM civicrm_gift_membership_codes WHERE contribution_id = '{$contributionId}'";
 	  	$dao = CRM_Core_DAO::executeQuery($sql);
+	  	/*** Add row for each code with corresponding membership purchased ***/
 	  	while($dao->fetch()){
 	  		$code = $dao->code;
 				$memType = $dao->membership_type;
@@ -178,12 +180,13 @@ function giftmemberships_civicrm_postProcess($formName, &$form){
 				$codeTable .= "<tr><td>{$memName}</td><td>{$code}</td></tr>";
 	  	}
 			$codeTable .= "</tbody></table>";
-			/*** TODO:: get organization id of site ***/
+			/*** get organization id of site ***/
 			$sql = "SELECT contact_id FROM civicrm_domain WHERE id = 1";
 			$dao = CRM_Core_DAO::executeQuery($sql);
 			if($dao->fetch()){
 				$orgEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($dao->contact_id);
 			}
+			/*** Prepare Params and Send Email ***/
 			$email = CRM_Contact_BAO_Contact::getPrimaryEmail($giverId);
 			$contactName = CRM_Contact_BAO_Contact::displayName($giverId);
 			$mailParams = array();
@@ -199,24 +202,28 @@ function giftmemberships_civicrm_postProcess($formName, &$form){
 /****** Validate Function ******/
 function giftmemberships_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$errors ){
 	if($formName == "CRM_Contribute_Form_Contribution_Main"){
+		/*** Search through Price fields for redeem-code hidden field ***/
     foreach($fields as $key =>$field){
     	if(strpos($key,'_redeem-code') !== false){
     	  $price = explode("_", $key);
     	  $pfid = $price[0];
     	  $priceName = "price_".$pfid;
     	  $code = $fields[$priceName];
+    	  /*** Check for Code in database ***/
     	  $sql = "SELECT membership_id FROM civicrm_gift_membership_codes WHERE code = '{$code}'";
     	  $dao = CRM_Core_DAO::executeQuery($sql);
   		  if($dao->fetch()){
 				  $membership_id = $dao->membership_id;
 				  $membership_type = $dao->membership_type;
 				  if($membership_id != null){
+				  	/*** If Membership ID is not NULL then it has already been used, return error ***/
 				  	$form->setElementError($priceName, NULL);
 				  	$errors[$priceName] = ts('Validation code has already been used');
 				  } else {
             $form->setElementError($priceName, NULL);            
 				  }
   		  } else {
+  		  	/*** If fetch fails then code is not in the system, return error ***/
   		  	$form->setElementError($priceName, NULL);
   		  	$errors[$priceName] = ts('Validation code in not our system');
   		  }
@@ -228,11 +235,10 @@ function giftmemberships_civicrm_validateForm( $formName, &$fields, &$files, &$f
 
 /****************** AlterContent ***************/
 function giftmemberships_civicrm_alterContent(&$content, $context, $tplName, &$object){
-	  $sql = "SELECT contact_id FROM civicrm_domain WHERE domain= 1";
-		//$orgEmail = CRM_Contact_BAO_Contact::getContactDetails();
-		//print $orgEmail;
+	/*** Add code table to view contribution page ***/
 	if($tplName == "CRM/Contribute/Page/Tab.tpl"){
 		$contributionId = $object->_id;
+		/*** Prepare table ***/
 		$codeTable = "<div id='codeTable'><h3>Gift Membership Codes</h3><table width='100%' style=><thead><tr><th>Membership</th><th>Code</th><th>Status</th></tr></thead><tbody>";
   	$sql = "SELECT * FROM civicrm_gift_membership_codes WHERE contribution_id = '{$contributionId}'";
 	  $dao = CRM_Core_DAO::executeQuery($sql);
@@ -241,16 +247,19 @@ function giftmemberships_civicrm_alterContent(&$content, $context, $tplName, &$o
 	  		$code = $dao->code;
 				$memType = $dao->membership_type;
 				$memId = $dao->membership_id;
+				/*** If membership is available say so,if not change status to redeemed ***/
 				if($memId == null){
 					$status = "available";
 				} else {
 					$status = "redeemed";
 				}
+				/*** Add row for each code with corresponding membership ***/
 				$result = civicrm_api3('MembershipType', 'getsingle', array('sequential' => 1,'id' => $memType));
 				$memName = $result['name']." Membership";
 				$codeTable .= "<tr><td>{$memName}</td><td>{$code}</td><td>{$status}</td></tr>";
 	  	}
 		$codeTable .= "</tbody></table></div>";
+		/*** Add table to page and javascript to reposition the table ***/
 		if($codeExists == true){
 			$content .= $codeTable;
 		  $content .= '<script>cj(".crm-info-panel:first").after(cj("#codeTable"));</script>';
@@ -442,6 +451,6 @@ function giftmemberships_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) 
 /*********************************************************************************************************************/
 /*** UberCart Integration ***/
 function uc_civicrm_form_product_node_form_alter(&$form, &$form_state, $form_id){
-  print $form_id;
-  
+  //print $form_id;
+  //die();
 }
