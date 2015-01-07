@@ -2,7 +2,11 @@
 <extension key="com.aghstrategies.giftmemberships" type="module">
   <file>giftmemberships</file>
   <name>Gift Memberships</name>
-  <description>FIXME</description>
+  <description>This extension allows people to purchase gift memberships through a price set, generates redemption codes and can redeem the code to create a new membership</description>
+  <urls>
+  	<url desc="Licensing">http://civicrm.org/licensing</url>
+  	<url desc="Support">http://aghstrategies.com</url>
+  </urls>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Tyrell Cook</author>
@@ -10,11 +14,13 @@
   </maintainer>
   <releaseDate>2014-10-24</releaseDate>
   <version>1.0</version>
-  <develStage>alpha</develStage>
+  <develStage>stable</develStage>
   <compatibility>
-    <ver>4.2</ver>
+    <ver>4.4</ver>
+    <ver>4.5</ver>
   </compatibility>
-  <comments>This is a new, undeveloped module</comments>
+  <downloadUrl>https://github.com/relldoesphp/com.aghstrategies.giftmemberships/archive/master.zip</downloadUrl>
+  <comments>In order to use this extension you will need to create two contribution pages. A page where you purchase gift memberships using a priceset that uses gift membership fields and a page where you redeem your memberhsip with a priceset that uses a gift redeem price field. For more please refer to the README.md file</comments>
   <civix>
     <namespace>CRM/Giftmemberships</namespace>
   </civix>
