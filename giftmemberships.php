@@ -173,7 +173,7 @@ function giftmemberships_civicrm_postProcess($formName, &$form){
 			}
 		}//end foreach
 	  /**** Send Email With Codes ****/
-	  if ($giftcodes == true) {
+	  if (isset($giftcodes) && $giftcodes == true) {
 	  	/*** Make beginning of Code Table ***/
 			$codeTable = "<h3>Gift Membership Codes</h3><table width='500px' style='border:1px solid #999;margin:1em 0em 1em;border-collapse:collapse'><thead><tr><th style='text-align:left;padding:4px;border-bottom:1px solid #999;background-color:#eee'>Membership</th><th style='text-align:left;padding:4px;border-bottom:1px solid #999;background-color:#eee'>Code</th></tr></thead><tbody>";
 			$sql = "SELECT * FROM civicrm_gift_membership_codes WHERE contribution_id = '{$contributionId}'";
