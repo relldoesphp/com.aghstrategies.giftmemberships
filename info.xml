@@ -6,6 +6,8 @@
   <urls>
   	<url desc="Licensing">http://civicrm.org/licensing</url>
   	<url desc="Support">http://aghstrategies.com</url>
+        <url desc="Documentation">https://civicrm.org/extensions/gift-memberships</url>
+        <url desc="Main Extension Page">https://civicrm.org/extensions/gift-memberships</url>
   </urls>
   <license>AGPL-3.0</license>
   <maintainer>
