@@ -213,6 +213,7 @@ function giftmemberships_civicrm_postProcess($formName, &$form){
 		/*** Search through Price fields for redeem-code hidden field ***/
 	  foreach ($fields as $key =>$field) {
 	  	if (strpos($key,'_redeem-code') !== false) {
+	  	  unset($form->_errors['_qf_default']);	
 	  	  $price = explode("_", $key);
 	  	  $pfid = $price[0];
 	  	  $priceName = "price_".$pfid;
