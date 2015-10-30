@@ -32,7 +32,7 @@ function giftmemberships_civicrm_buildForm($formName, &$form) {
             $membershipSelect[$membershipType['id']] = $membershipType['name'].': '.$membershipType['minimum_fee'];
         }
         $form->add('select', "membershipselect", ts('Select Membership Type'), $membershipSelect);
-        // Add template for select field to form .
+        // Add template for select field to formxfg.
         $templatePath = realpath(dirname(__FILE__)."/templates");
         CRM_Core_Region::instance('page-body')->add(array(
                                                         'template' => "{$templatePath}/pricefieldOthersignup.tpl"
@@ -467,4 +467,14 @@ function giftmemberships_civicrm_caseTypes(&$caseTypes) {
  */
 function giftmemberships_civicrm_alterSettingsFolders(&$metaDataFolders = null) {
     _giftmemberships_civix_civicrm_alterSettingsFolders($metaDataFolders);
+}
+
+/**
+ * Implements hook_civicrm_alter_drupal_entities.
+ *
+ * @see https://drupal.org/project/civicrm_entity
+ */
+function giftmemberships_civicrm_alter_drupal_entities(&$whitelist) {
+    $whitelist['civicrm_gift_membership_codes'] = 'gift_membership_codes';
+    $whitelist['civicrm_gift_membership_price_fields'] = 'gift_membership_price_fields';
 }
