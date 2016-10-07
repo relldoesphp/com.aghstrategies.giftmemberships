@@ -136,7 +136,7 @@ function giftmemberships_civicrm_postProcess($formName, &$form) {
         $contributionId = $form->_contributionID;
         $giverId = $form->_contactID;
         foreach ($submitValues as $key => $value) {
-            if (strpos($key, '_gift-codes') !== false) {
+            if (strpos($key, '_gift-codes') !== false && !empty($value)) {
                 $giftcodes = true;
                 $price = explode("_", $key);
                 $pfid = $price[0];
