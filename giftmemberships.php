@@ -16,7 +16,7 @@ function giftmemberships_civicrm_buildForm($formName, &$form) {
     if ($formName == "CRM_Price_Form_Field") {
         // Add gift membership to select for html_type.
         $html = $form->getElement('html_type');
-        $html->addOption('Gift Memberhship Field', 'gift_membership');
+        $html->addOption('Gift Membership Field', 'gift_membership');
         $html->addOption('Redeem Gift Membership', 'redeem_membership');
         // Add hidden field that changes value if gift memberhsip is selected.
         $form->addElement('hidden', 'gift-check', '0');
@@ -24,7 +24,10 @@ function giftmemberships_civicrm_buildForm($formName, &$form) {
         // Add membership type dropdown using api.
         $membershipSelect = array();
         try {
-            $result = civicrm_api3('MembershipType', 'get', array( 'sequential' => 1, ));
+            $result = civicrm_api3('MembershipType', 'get', array(
+              'sequential' => 1,
+              'options' => array('limit' => 0),
+            ));
         } catch (CiviCRM_API3_Exception $e) {
             $error = $e->getMessage();
         }
@@ -50,7 +53,7 @@ function giftmemberships_civicrm_buildForm($formName, &$form) {
                     // Set value of html_type.
                     $form->getElement('html_type')->setValue('gift_membership');
                     // Check for membership type in DB.
-                    $sql = "SELECT pfid FROM civicrm_gift_membership_price_fields WHERE pfid = {$pfid};";
+                    $sql = "SELECT pfid, membership_type_id FROM civicrm_gift_membership_price_fields WHERE pfid = {$pfid};";
                     $dao = CRM_Core_DAO::executeQuery($sql);
                     if ($dao->fetch()) {
                         $membershipType = $dao->membership_type_id;
@@ -266,7 +269,7 @@ function giftmemberships_civicrm_validateForm($formName, &$fields, &$files, &$fo
  */
 function giftmemberships_civicrm_alterContent(&$content, $context, $tplName, &$object) {
     // Add code table to view contribution page.
-    if ($tplName == "CRM/Contribute/Page/Tab.tpl") {
+    if ($tplName == "CRM/Contribute/Page/Tab.tpl" && !empty($object->_id)) {
         $contributionId = $object->_id;
         // Prepare table.
         $codeTable = "<div id='codeTable'><h3>Gift Membership Codes</h3><table width='100%' style=><thead><tr><th>Membership</th><th>Code</th><th>Status</th></tr></thead><tbody>";
@@ -290,7 +293,7 @@ function giftmemberships_civicrm_alterContent(&$content, $context, $tplName, &$o
         }
         $codeTable .= "</tbody></table></div>";
         // Add table to page and javascript to reposition the table.
-        if ($codeExists == true) {
+        if (!empty($codeExists)) {
             $content .= $codeTable;
             $content .= '<script>cj(".crm-info-panel:first").after(cj("#codeTable"));</script>';
         }
