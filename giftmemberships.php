@@ -201,7 +201,7 @@ function giftmemberships_civicrm_postProcess($formName, &$form) {
                 $memType = $dao->membership_type;
                 $result = civicrm_api3('MembershipType', 'getsingle', array('sequential' => 1,'id' => $memType));
                 $memName = $result['name']." Membership";
-                $codeTable .= "<tr><td>{$memName}</td><td>{$code}</td></tr>";
+                $codeTable .= "<tr><td>{$memName}</td><td><strong>{$code}</strong></td></tr>";
             }
             $codeTable .= "</tbody></table>";
             // get organization id of site.
