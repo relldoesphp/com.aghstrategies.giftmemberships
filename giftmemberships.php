@@ -201,7 +201,7 @@ function giftmemberships_civicrm_postProcess($formName, &$form) {
                 $memType = $dao->membership_type;
                 $result = civicrm_api3('MembershipType', 'getsingle', array('sequential' => 1,'id' => $memType));
                 $memName = $result['name']." Membership";
-                $codeTable .= "<tr><td>{$memName}</td><td>{$code}</td></tr>";
+                $codeTable .= "<tr><td>{$memName}</td><td><strong>{$code}</strong></td></tr>";
             }
             $codeTable .= "</tbody></table>";
             // get organization id of site.
@@ -231,8 +231,32 @@ function giftmemberships_civicrm_postProcess($formName, &$form) {
  */
 function giftmemberships_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
     if ($formName == "CRM_Contribute_Form_Contribution_Main") {
-        // Search through Price fields for redeem-code hidden field.
+        $atLeastOneMembership = null; // we don't know if we're on the gift or redeem page yet
+        // Search through Price fields for gift-code and redeem-code hidden fields
         foreach ($fields as $key => $field) {
+            if (strpos($key, '_gift-codes') !== false) {
+                unset($form->_errors['_qf_default']);
+                $price = explode("_", $key);
+                $pfid = $price[0];
+                $priceName = "price_".$pfid;
+                $value = $fields[$priceName];
+                if (($value != "") and (filter_var($value, FILTER_VALIDATE_INT) === false  or ($value < 0) or ($value > 10))) {
+                        $form->setElementError($priceName, null);
+                        // zero is also acceptable, as long as at least one option is non-zero. but saying 1-10 is clearer.
+                        $errors[$priceName] = ts('Must be a whole number between 1 and 10');
+                }
+                if ($atLeastOneMembership == null) {
+                        // we're on the gift-code page, and we don't know of any selected memberships yet
+                        $atLeastOneMembership = false;
+                }
+                if (($value == "") or ($value == "0")) {
+                        // save this for later in case there are zero chosen memberships
+                        $zeroMembershipDetails[] = $priceName;
+                } else {
+                        // at least one membership option is non-zero
+                        $atLeastOneMembership = true;
+                }
+            }
             if (strpos($key, '_redeem-code') !== false) {
                 unset($form->_errors['_qf_default']);
                 $price = explode("_", $key);
@@ -257,6 +281,13 @@ function giftmemberships_civicrm_validateForm($formName, &$fields, &$files, &$fo
                     $form->setElementError($priceName, null);
                     $errors[$priceName] = ts('Validation code in not our system');
                 }
+            }
+        }
+        if ($atLeastOneMembership == false) {
+            foreach ($zeroMembershipDetails as $key => $value) {
+                $priceName = $value;
+                $form->setElementError($priceName, null);
+                $errors[$priceName] = ts('Must choose at least one membership');
             }
         }
     }
